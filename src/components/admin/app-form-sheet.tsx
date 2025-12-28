@@ -55,11 +55,15 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
   const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
   const [selectedApkFileName, setSelectedApkFileName] = useState<string | null>(null);
   const [iconPreview, setIconPreview] = useState<string | null>(null);
+  const [apkDataUrl, setApkDataUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
 
   useEffect(() => {
     const currentData = app || initialFormData;
     setFormData(currentData);
     setSelectedApkFileName(null);
+    setApkDataUrl(null);
     
     if (currentData.iconUrl) {
       setIconPreview(currentData.iconUrl);
@@ -83,10 +87,16 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
   };
 
   const handleApkFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setSelectedApkFileName(e.target.files[0].name);
-      // In a real app, you would handle the file upload process here
-      // and get a download URL.
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      setSelectedApkFileName(file.name);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setApkDataUrl(reader.result as string);
+        setIsUploading(false);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -105,13 +115,15 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
 
 
   const handleSaveClick = () => {
-    // In a real app, you'd handle the file upload here.
-    // For now, we'll just use a placeholder URL.
-    if (formData.downloadUrl === '') {
-      onSave({...formData, downloadUrl: '#'});
-    } else {
-      onSave(formData);
+    let dataToSave = { ...formData };
+    if (apkDataUrl) {
+      dataToSave.downloadUrl = apkDataUrl;
+    } else if (!app?.downloadUrl) {
+      // If no new apk is uploaded and there was no existing URL, set placeholder
+      dataToSave.downloadUrl = '#';
     }
+
+    onSave(dataToSave);
     setIsOpen(false);
   };
   
@@ -180,11 +192,11 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
                 <Button asChild variant="outline">
                   <label htmlFor="apkFile" className="cursor-pointer">
                     <Upload className="mr-2 h-4 w-4" />
-                    Upload APK
-                    <Input id="apkFile" type="file" className="sr-only" accept=".apk" onChange={handleApkFileChange} />
+                    {isUploading ? 'Uploading...' : 'Upload APK'}
+                    <Input id="apkFile" type="file" className="sr-only" accept=".apk" onChange={handleApkFileChange} disabled={isUploading} />
                   </label>
                 </Button>
-                {selectedApkFileName && <span className="text-sm text-muted-foreground truncate">{selectedApkFileName}</span>}
+                {selectedApkFileName && <span className="text-sm text-muted-foreground truncate max-w-xs">{selectedApkFileName}</span>}
               </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -217,7 +229,7 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
             <SheetClose asChild>
               <Button variant="outline">Cancel</Button>
             </SheetClose>
-            <Button onClick={handleSaveClick}>Save changes</Button>
+            <Button onClick={handleSaveClick} disabled={isUploading}>Save changes</Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>

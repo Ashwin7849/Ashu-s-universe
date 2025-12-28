@@ -21,6 +21,8 @@ type AppCardProps = {
 export function AppCard({ app }: AppCardProps) {
   const appImage = PlaceHolderImages.find((img) => img.id === app.icon);
   const iconSrc = app.iconUrl || appImage?.imageUrl;
+  
+  const downloadFilename = `${app.name.replace(/\s+/g, '_')}_v${app.version}.apk`;
 
   return (
     <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-primary/20 hover:shadow-lg hover:-translate-y-1">
@@ -62,10 +64,10 @@ export function AppCard({ app }: AppCardProps) {
       </CardContent>
       <CardFooter className="flex-col items-stretch gap-2 p-4 pt-0">
         <Button asChild>
-          <Link href={app.downloadUrl}>
+          <a href={app.downloadUrl} download={downloadFilename}>
             <Download className="mr-2 h-4 w-4" />
             Download ({app.downloads.toLocaleString()})
-          </Link>
+          </a>
         </Button>
         {app.projectUrl && (
           <Button variant="secondary" asChild>
