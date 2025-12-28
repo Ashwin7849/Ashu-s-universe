@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import type { App } from "@/lib/types";
@@ -66,7 +67,7 @@ export function AppCard({ app }: AppCardProps) {
         <Button asChild>
           <a href={app.downloadLink} download={downloadFilename}>
             <Download className="mr-2 h-4 w-4" />
-            Download ({app.downloadCount.toLocaleString()})
+            Download ({(app.downloadCount || 0).toLocaleString()})
           </a>
         </Button>
         <div className="flex gap-2">

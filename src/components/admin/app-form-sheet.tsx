@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -124,7 +125,10 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
 
 
   const handleSaveClick = () => {
-    let dataToSave = { ...formData };
+    let dataToSave = { 
+      ...formData,
+      downloadCount: Number(formData.downloadCount) || 0,
+     };
     if (apkDataUrl) {
       dataToSave.downloadLink = apkDataUrl;
     } else if (!app?.downloadLink) {
