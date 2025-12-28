@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Globe } from "lucide-react";
+import { Download, Globe, Send } from "lucide-react";
 
 type AppCardProps = {
   app: App;
@@ -60,23 +60,33 @@ export function AppCard({ app }: AppCardProps) {
         </div>
       </CardHeader>
       <CardContent className="flex-1 p-4 pt-0">
-        <CardDescription>{app.description}</CardDescription>
+        <CardDescription>{app.shortDescription}</CardDescription>
       </CardContent>
       <CardFooter className="flex-col items-stretch gap-2 p-4 pt-0">
         <Button asChild>
-          <a href={app.downloadUrl} download={downloadFilename}>
+          <a href={app.downloadLink} download={downloadFilename}>
             <Download className="mr-2 h-4 w-4" />
-            Download ({app.downloads.toLocaleString()})
+            Download ({app.downloadCount.toLocaleString()})
           </a>
         </Button>
-        {app.projectUrl && (
-          <Button variant="secondary" asChild>
-            <Link href={app.projectUrl}>
-              <Globe className="mr-2 h-4 w-4" />
-              Website / Telegram
-            </Link>
-          </Button>
-        )}
+        <div className="flex gap-2">
+            {app.websiteLink && (
+            <Button variant="secondary" asChild className="flex-1">
+                <Link href={app.websiteLink} target="_blank">
+                <Globe className="mr-2 h-4 w-4" />
+                Website
+                </Link>
+            </Button>
+            )}
+            {app.telegramLink && (
+            <Button variant="secondary" asChild className="flex-1">
+                <Link href={app.telegramLink} target="_blank">
+                <Send className="mr-2 h-4 w-4" />
+                Telegram
+                </Link>
+            </Button>
+            )}
+        </div>
       </CardFooter>
     </Card>
   );

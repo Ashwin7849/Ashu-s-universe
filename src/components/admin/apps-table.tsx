@@ -71,18 +71,20 @@ export function AppsTable() {
 
   const handleSave = (appData: AppType) => {
     if (!firestore) return;
+    
+    // Create a copy to avoid unintended direct state mutation
+    const dataToSave = { ...appData };
+    delete (dataToSave as any).id; // Remove ID before saving to Firestore
 
     if (editingApp) {
       // Update existing app
       const docRef = doc(firestore, 'apps', appData.id);
-      const { id, ...dataToUpdate } = appData;
-      updateDocumentNonBlocking(docRef, dataToUpdate);
+      updateDocumentNonBlocking(docRef, dataToSave);
       toast({ title: "Success", description: "App updated successfully." });
     } else {
       // Add new app
       const appsCollectionRef = collection(firestore, 'apps');
-      const { id, ...dataToAdd } = appData;
-      addDocumentNonBlocking(appsCollectionRef, dataToAdd);
+      addDocumentNonBlocking(appsCollectionRef, dataToSave);
       toast({ title: "Success", description: "App added successfully." });
     }
   };
@@ -158,7 +160,7 @@ export function AppsTable() {
                         {app.isVisible ? 'Visible' : 'Hidden'}
                       </Badge>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">{app.downloads.toLocaleString()}</TableCell>
+                    <TableCell className="hidden md:table-cell">{app.downloadCount.toLocaleString()}</TableCell>
                     <TableCell className="hidden md:table-cell">v{app.version}</TableCell>
                     <TableCell>
                       <DropdownMenu>

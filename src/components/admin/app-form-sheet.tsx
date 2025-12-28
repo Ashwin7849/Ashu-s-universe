@@ -38,15 +38,17 @@ interface AppFormSheetProps {
 const initialFormData: App = {
   id: '',
   name: '',
-  description: '',
+  shortDescription: '',
+  longDescription: '',
   version: '',
   size: '',
   icon: 'app-icon-1',
   iconUrl: '',
-  downloadUrl: '',
-  projectUrl: '',
+  downloadLink: '#',
+  telegramLink: '',
+  websiteLink: '',
   tag: 'NEW',
-  downloads: 0,
+  downloadCount: 0,
   isVisible: true,
 };
 
@@ -60,7 +62,14 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
 
 
   useEffect(() => {
-    const currentData = app || initialFormData;
+    const currentData = app ? {
+        ...initialFormData,
+        ...app,
+        shortDescription: app.shortDescription || '',
+        longDescription: app.longDescription || '',
+        telegramLink: app.telegramLink || '',
+        websiteLink: app.websiteLink || '',
+    } : initialFormData;
     setFormData(currentData);
     setSelectedApkFileName(null);
     setApkDataUrl(null);
@@ -117,10 +126,9 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
   const handleSaveClick = () => {
     let dataToSave = { ...formData };
     if (apkDataUrl) {
-      dataToSave.downloadUrl = apkDataUrl;
-    } else if (!app?.downloadUrl) {
-      // If no new apk is uploaded and there was no existing URL, set placeholder
-      dataToSave.downloadUrl = '#';
+      dataToSave.downloadLink = apkDataUrl;
+    } else if (!app?.downloadLink) {
+      dataToSave.downloadLink = '#';
     }
 
     onSave(dataToSave);
@@ -128,7 +136,7 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
   };
   
   const handleAiGeneratedDescription = (description: string) => {
-    setFormData(prev => ({ ...prev, description }));
+    setFormData(prev => ({ ...prev, shortDescription: description }));
   };
 
   return (
@@ -148,12 +156,12 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
             </div>
             <div className="grid grid-cols-4 items-start gap-4">
               <div className="text-right flex flex-col items-end gap-1">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="shortDescription">Description</Label>
                 <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setIsAiDialogOpen(true)}>
                   <Sparkles className="h-4 w-4 text-primary" />
                 </Button>
               </div>
-              <Textarea id="description" value={formData.description} onChange={handleChange} className="col-span-3" />
+              <Textarea id="shortDescription" value={formData.shortDescription} onChange={handleChange} className="col-span-3" />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="version" className="text-right">Version</Label>
@@ -200,8 +208,12 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
               </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="projectUrl" className="text-right">Project URL</Label>
-              <Input id="projectUrl" value={formData.projectUrl || ''} onChange={handleChange} className="col-span-3" placeholder="Optional" />
+              <Label htmlFor="websiteLink" className="text-right">Website URL</Label>
+              <Input id="websiteLink" value={formData.websiteLink || ''} onChange={handleChange} className="col-span-3" placeholder="Optional" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="telegramLink" className="text-right">Telegram URL</Label>
+              <Input id="telegramLink" value={formData.telegramLink || ''} onChange={handleChange} className="col-span-3" placeholder="Optional" />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="tag" className="text-right">Tag</Label>
@@ -217,8 +229,8 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
               </Select>
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="downloads" className="text-right">Downloads</Label>
-              <Input id="downloads" type="number" value={formData.downloads} onChange={(e) => setFormData(p=>({...p, downloads: Number(e.target.value)}))} className="col-span-3" />
+              <Label htmlFor="downloadCount" className="text-right">Downloads</Label>
+              <Input id="downloadCount" type="number" value={formData.downloadCount} onChange={(e) => setFormData(p=>({...p, downloadCount: Number(e.target.value)}))} className="col-span-3" />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="isVisible" className="text-right">Visible</Label>

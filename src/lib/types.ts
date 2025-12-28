@@ -5,15 +5,17 @@ export type AppTag = "NEW" | "UPDATED" | "HOT";
 export type App = {
   id: string;
   name: string;
-  description: string;
+  shortDescription: string;
+  longDescription: string;
   version: string;
   size: string;
   icon: string; // id from placeholder-images.json
   iconUrl?: string; // Data URL for custom uploaded icon
-  downloadUrl: string;
-  projectUrl?: string;
+  downloadLink: string;
+  telegramLink?: string;
+  websiteLink?: string;
   tag?: AppTag;
-  downloads: number;
+  downloadCount: number;
   isVisible: boolean;
 };
 
