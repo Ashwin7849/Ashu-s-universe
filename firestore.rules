@@ -1,0 +1,79 @@
+/**
+ * Core Philosophy: This ruleset enforces a strict role-based access model where the website's content
+ * is publicly readable by everyone, but can only be managed by a designated set of administrators.
+ * This supports an "app store" or portfolio-style website where anonymous users can browse content,
+ * and authenticated admins can use a panel to manage that content.
+ *
+ * Data Structure:
+ * - /apps/{appId}: A top-level collection containing all public application data.
+ * - /roles_admin/{userId}: A private collection that grants admin privileges. If a user's UID exists
+ *   as a document ID in this collection, they are considered an admin.
+ * - /website_settings/global: A singleton document for publicly readable website configuration.
+ *
+ * Key Security Decisions:
+ * - Public Read-Only Default: Data in /apps and /website_settings is publicly readable to ensure the
+ *   website is functional for all visitors, including those not signed in.
+ * - Admin-Only Writes: All write operations (create, update, delete) across the database are restricted
+ *   to users who are authenticated and possess an admin role.
+ * - Admin Role Management: The /roles_admin collection is used to efficiently check for admin status
+ *   using an `exists()` call, which is highly performant. This collection is secured so that only
+ *   existing admins can manage its documents, preventing unauthorized self-promotion to admin status.
+ * - No User Enumeration: Listing documents in the /roles_admin collection is explicitly disallowed to
+ *   prevent malicious actors from discovering the identities of all administrators.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ------------------------------------------------------------------------
+    // Helper Functions
+    // ------------------------------------------------------------------------
+
+    /**
+     * Checks if the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the authenticated user has an admin role.
+     * An admin is defined by the existence of a document in the /roles_admin
+     * collection where the document ID matches the user's UID.
+     */
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+
+    // ------------------------------------------------------------------------
+    // Collection Rules
+    // ------------------------------------------------------------------------
+
+    /**
+     * Publicly readable collection of all applications. Only admins can manage the apps.
+     */
+    match /apps/{appId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    /**
+     * Defines which users have administrator privileges. Document ID must match user UID.
+     * Only admins can create other admins. Individual users can read their own role.
+     */
+    match /roles_admin/{userId} {
+      allow get: if isSignedIn() && request.auth.uid == userId;
+      allow list: if false; // Prevent listing all admins
+      allow write: if isAdmin();
+    }
+
+    /**
+     * Singleton document for global website settings. Publicly readable, admin-writable.
+     */
+    match /website_settings/global {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

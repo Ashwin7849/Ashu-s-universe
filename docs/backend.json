@@ -1,0 +1,195 @@
+{
+  "entities": {
+    "App": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "App",
+      "type": "object",
+      "description": "Represents an application listed on the AppVerse Hub.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the App entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the application."
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "A brief description of the application."
+        },
+        "longDescription": {
+          "type": "string",
+          "description": "A detailed description of the application."
+        },
+        "version": {
+          "type": "string",
+          "description": "The version number of the application."
+        },
+        "size": {
+          "type": "string",
+          "description": "The size of the application file."
+        },
+        "downloadLink": {
+          "type": "string",
+          "description": "URL for downloading the application.",
+          "format": "uri"
+        },
+        "telegramLink": {
+          "type": "string",
+          "description": "URL for the application's Telegram channel.",
+          "format": "uri"
+        },
+        "websiteLink": {
+          "type": "string",
+          "description": "URL for the application's website.",
+          "format": "uri"
+        },
+        "tag": {
+          "type": "string",
+          "description": "Tag indicating the application's status (e.g., NEW, UPDATED, HOT)."
+        },
+        "iconUrl": {
+          "type": "string",
+          "description": "URL for the application's icon image.",
+          "format": "uri"
+        },
+        "isVisible": {
+          "type": "boolean",
+          "description": "Indicates whether the app is visible on the website."
+        },
+        "downloadCount": {
+          "type": "number",
+          "description": "The number of times the application has been downloaded."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "shortDescription",
+        "version",
+        "size",
+        "downloadLink",
+        "isVisible",
+        "downloadCount"
+      ]
+    },
+    "AdminUser": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AdminUser",
+      "type": "object",
+      "description": "Represents an administrator user with access to the admin panel. This is a simplified representation; actual authentication should be handled by Firebase Auth or similar.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the AdminUser entity."
+        },
+        "username": {
+          "type": "string",
+          "description": "Admin username."
+        }
+      },
+      "required": [
+        "id",
+        "username"
+      ]
+    },
+    "WebsiteSettings": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WebsiteSettings",
+      "type": "object",
+      "description": "Represents global website settings configurable via the admin panel.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WebsiteSettings entity.  There should only be one of these."
+        },
+        "whatsappChannelLink": {
+          "type": "string",
+          "description": "URL for the WhatsApp channel button.",
+          "format": "uri"
+        },
+        "telegramChannelLink": {
+          "type": "string",
+          "description": "URL for the Telegram channel button.",
+          "format": "uri"
+        },
+        "instagramLink": {
+          "type": "string",
+          "description": "URL for the Instagram button.",
+          "format": "uri"
+        },
+        "youtubeLink": {
+          "type": "string",
+          "description": "URL for the YouTube button.",
+          "format": "uri"
+        },
+        "heroTitle": {
+          "type": "string",
+          "description": "Title for the Hero section."
+        },
+        "heroSubtitle": {
+          "type": "string",
+          "description": "Subtitle for the Hero section."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/apps/{appId}",
+        "definition": {
+          "entityName": "App",
+          "schema": {
+            "$ref": "#/backend/entities/App"
+          },
+          "description": "Stores information about each application listed on the hub.",
+          "params": [
+            {
+              "name": "appId",
+              "description": "Unique identifier for the application."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{adminId}",
+        "definition": {
+          "entityName": "AdminUser",
+          "schema": {
+            "$ref": "#/backend/entities/AdminUser"
+          },
+          "description": "Collection to store admin user IDs. Existence of a document implies admin role. This ensures authorization independence.",
+          "params": [
+            {
+              "name": "adminId",
+              "description": "The unique identifier of the admin user (same as their Firebase Auth UID)."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/website_settings/global",
+        "definition": {
+          "entityName": "WebsiteSettings",
+          "schema": {
+            "$ref": "#/backend/entities/WebsiteSettings"
+          },
+          "description": "Stores global website settings. There should only be a single document with ID 'global'. Only admins can modify this document.",
+          "params": []
+        }
+      }
+    ],
+    "reasoning": "This Firestore structure prioritizes security, scalability, and debuggability, following the core design principles.  It focuses on enabling a portfolio application with an admin panel for managing apps and website settings. Authorization Independence is achieved through the use of dedicated collections for admin roles, eliminating the need for `get()` calls in security rules.  QAPs are addressed by segregating data with different access requirements (public apps vs. admin settings) and utilizing existence checks for global roles (admins).  The structure also supports invariants like ensuring only admins can modify website settings."
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "placeholderImages": [
+    {
+      "id": "profile-pic",
+      "description": "Developer profile picture",
+      "imageUrl": "https://images.unsplash.com/photo-1689218742383-c4e7b8494e75?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxkZXZlbG9wZXIlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjY4MjY3ODd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "developer portrait"
+    },
+    {
+      "id": "app-icon-1",
+      "description": "App icon for a productivity app",
+      "imageUrl": "https://images.unsplash.com/photo-1611606063065-ee7946f0787a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxhcHAlMjBpY29ufGVufDB8fHx8MTc2NjgwNjQ2N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "app icon"
+    },
+    {
+      "id": "app-icon-2",
+      "description": "App icon for a gaming app",
+      "imageUrl": "https://images.unsplash.com/photo-1539112832111-9fc136e254bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxhcHAlMjBpY29uJTIwZ2FtZXxlbnwwfHx8fDE3NjY4OTI3NTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "app icon game"
+    },
+    {
+      "id": "app-icon-3",
+      "description": "App icon for a social media app",
+      "imageUrl": "https://images.unsplash.com/photo-1762340273878-c98c78a45a1a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhcHAlMjBpY29uJTIwc29jaWFsfGVufDB8fHx8MTc2Njg5Mjc1Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "app icon social"
+    },
+    {
+      "id": "app-icon-4",
+      "description": "App icon for a utility app",
+      "imageUrl": "https://images.unsplash.com/photo-1746289761805-901ea1e02747?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhcHAlMjBpY29uJTIwdXRpbGl0eXxlbnwwfHx8fDE3NjY4OTI3NTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "app icon utility"
+    },
+    {
+      "id": "app-icon-5",
+      "description": "App icon for an entertainment app",
+      "imageUrl": "https://images.unsplash.com/photo-1762340914620-b61fccca2c4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhcHAlMjBpY29uJTIwZW50ZXJ0YWlubWVudHxlbnwwfHx8fDE3NjY4OTI3NTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "app icon entertainment"
+    }
+  ]
+}
