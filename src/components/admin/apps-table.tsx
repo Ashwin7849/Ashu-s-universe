@@ -160,7 +160,7 @@ export function AppsTable() {
                         {app.isVisible ? 'Visible' : 'Hidden'}
                       </Badge>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">{app.downloadCount.toLocaleString()}</TableCell>
+                    <TableCell className="hidden md:table-cell">{(app.downloadCount || 0).toLocaleString()}</TableCell>
                     <TableCell className="hidden md:table-cell">v{app.version}</TableCell>
                     <TableCell>
                       <DropdownMenu>

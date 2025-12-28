@@ -125,7 +125,7 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
 
 
   const handleSaveClick = () => {
-    let dataToSave = { 
+    const dataToSave = { 
       ...formData,
       downloadCount: Number(formData.downloadCount) || 0,
      };
@@ -234,7 +234,7 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="downloadCount" className="text-right">Downloads</Label>
-              <Input id="downloadCount" type="number" value={formData.downloadCount} onChange={(e) => setFormData(p=>({...p, downloadCount: Number(e.target.value)}))} className="col-span-3" />
+              <Input id="downloadCount" type="number" value={formData.downloadCount} onChange={(e) => setFormData(p=>({...p, downloadCount: Number(e.target.value) || 0}))} className="col-span-3" />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="isVisible" className="text-right">Visible</Label>
