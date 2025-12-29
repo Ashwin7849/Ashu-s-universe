@@ -30,10 +30,14 @@ export default function SettingsPage() {
 
   const [formData, setFormData] = useState<Partial<ProfileData>>({});
   const [isSaving, setIsSaving] = useState(false);
+  const [skillsString, setSkillsString] = useState('');
 
   useEffect(() => {
     if (settings) {
       setFormData(settings);
+      if (Array.isArray(settings.skills)) {
+        setSkillsString(settings.skills.join(', '));
+      }
     }
   }, [settings]);
 
@@ -45,10 +49,11 @@ export default function SettingsPage() {
   const handleSelectChange = (id: string, value: string) => {
     setFormData(prev => ({ ...prev, [id]: value }));
   };
-
+  
   const handleSkillsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, skills: e.target.value.split(',').map(s => s.trim()) }));
+    setSkillsString(e.target.value);
   };
+
 
   const handleSave = async () => {
     if (!firestore) {
@@ -56,10 +61,15 @@ export default function SettingsPage() {
       return;
     }
     setIsSaving(true);
+    
+    const dataToSave = {
+      ...formData,
+      skills: skillsString.split(',').map(s => s.trim()).filter(s => s),
+    };
+
     try {
       const docRef = doc(firestore, 'website_settings', 'global');
-      // Using merge: true to avoid overwriting fields not in the form
-      updateDocumentNonBlocking(docRef, formData); 
+      updateDocumentNonBlocking(docRef, dataToSave); 
       toast({ title: 'Success!', description: 'Your settings have been saved.' });
     } catch (error) {
       console.error("Error saving settings: ", error);
@@ -142,7 +152,7 @@ export default function SettingsPage() {
           </div>
            <div className="space-y-2">
             <Label htmlFor="skills">Skills & Technologies</Label>
-            <Input id="skills" value={formData.skills?.join(', ') || ''} onChange={handleSkillsChange} placeholder="Comma-separated, e.g., React, Next.js, Firebase"/>
+            <Input id="skills" value={skillsString} onChange={handleSkillsChange} placeholder="Comma-separated, e.g., React, Next.js, Firebase"/>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
