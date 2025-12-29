@@ -23,7 +23,8 @@ export function AppCard({ app }: AppCardProps) {
   const appImage = PlaceHolderImages.find((img) => img.id === app.icon);
   const iconSrc = app.iconUrl || appImage?.imageUrl;
   
-  const downloadFilename = `${app.name.replace(/\s+/g, '_')}_v${app.version}.apk`;
+  const downloadFilename = app.downloadLink.startsWith('data:') ? `${app.name.replace(/\s+/g, '_')}_v${app.version}.apk` : undefined;
+
 
   return (
     <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-primary/20 hover:shadow-lg hover:-translate-y-1">
