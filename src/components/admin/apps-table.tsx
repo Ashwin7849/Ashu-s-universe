@@ -32,13 +32,13 @@ import type { App as AppType } from '@/lib/types';
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useToast } from "@/hooks/use-toast";
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, doc, deleteDoc } from 'firebase/firestore';
+import { collection, doc } from 'firebase/firestore';
 import { addDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { Skeleton } from '../ui/skeleton';
 
 export function AppsTable() {
   const firestore = useFirestore();
-  const appsCollection = useMemoFirebase(() => collection(firestore, 'apps'), [firestore]);
+  const appsCollection = useMemoFirebase(() => firestore ? collection(firestore, 'apps') : null, [firestore]);
   const { data: apps, isLoading } = useCollection<AppType>(appsCollection);
   
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -69,23 +69,29 @@ export function AppsTable() {
     toast({ title: "Success", description: "App visibility updated." });
   };
 
-  const handleSave = (appData: AppType) => {
+  const handleSave = async (appData: AppType) => {
     if (!firestore) return;
-    
-    // Create a copy to avoid unintended direct state mutation
-    const dataToSave = { ...appData };
-    delete (dataToSave as any).id; // Remove ID before saving to Firestore
 
     if (editingApp) {
       // Update existing app
-      const docRef = doc(firestore, 'apps', appData.id);
-      updateDocumentNonBlocking(docRef, dataToSave);
+      const { id, ...dataToUpdate } = appData;
+      const docRef = doc(firestore, 'apps', id);
+      updateDocumentNonBlocking(docRef, dataToUpdate);
       toast({ title: "Success", description: "App updated successfully." });
     } else {
       // Add new app
+      const { id, ...dataToAdd } = appData; // The local ID is not needed for a new doc
       const appsCollectionRef = collection(firestore, 'apps');
-      addDocumentNonBlocking(appsCollectionRef, dataToSave);
-      toast({ title: "Success", description: "App added successfully." });
+      try {
+        const newDocRef = await addDocumentNonBlocking(appsCollectionRef, dataToAdd);
+        if (newDocRef) {
+          // Optionally update the new doc with its own ID if your data model requires it
+          updateDocumentNonBlocking(newDocRef, { id: newDocRef.id });
+        }
+        toast({ title: "Success", description: "App added successfully." });
+      } catch (e) {
+        toast({ variant: "destructive", title: "Error", description: "Failed to add app." });
+      }
     }
   };
 
