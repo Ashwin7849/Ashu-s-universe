@@ -49,14 +49,19 @@ export default function DashboardPage() {
       <div className="flex items-center justify-center rounded-lg border border-dashed shadow-sm p-8">
         <div className="flex flex-col items-center gap-1 text-center">
           <h3 className="text-2xl font-bold tracking-tight">
-            More analytics coming soon!
+            What would you like to do?
           </h3>
           <p className="text-sm text-muted-foreground">
-            You can manage your apps by navigating to the Apps page.
+            Manage your apps or update your public profile.
           </p>
-          <Button className="mt-4" asChild>
-            <Link href="/admin/dashboard/apps">Manage Apps</Link>
-          </Button>
+          <div className="mt-4 flex gap-4">
+            <Button asChild>
+              <Link href="/admin/dashboard/apps">Manage Apps</Link>
+            </Button>
+            <Button variant="outline" asChild>
+                <Link href="/admin/dashboard/settings">Update Profile</Link>
+            </Button>
+          </div>
         </div>
       </div>
     </>
