@@ -71,29 +71,37 @@ export function AppsTable() {
   };
 
   const handleSave = async (appData: AppType) => {
-    if (!firestore) return;
-
-    if (editingApp || appData.id.startsWith("temp_")) {
-      // Update existing app or a new app that has a temporary ID
-      const { id, ...dataToUpdate } = appData;
-      if (editingApp) {
-        const docRef = doc(firestore, 'apps', id);
-        updateDocumentNonBlocking(docRef, dataToUpdate);
-        toast({ title: "Success", description: "App updated successfully." });
-      } else {
-         const appsCollectionRef = collection(firestore, 'apps');
-         try {
-            const newDocRef = await addDocumentNonBlocking(appsCollectionRef, dataToUpdate);
-            if (newDocRef) {
-                updateDocumentNonBlocking(newDocRef, { id: newDocRef.id });
-            }
-            toast({ title: "Success", description: "App added successfully." });
-         } catch (e) {
-            toast({ variant: "destructive", title: "Error", description: "Failed to add app." });
-         }
-      }
+    if (!firestore) {
+        toast({ variant: "destructive", title: "Error", description: "Database not connected." });
+        return;
     }
-  };
+
+    const { id, ...dataToSave } = appData;
+
+    if (editingApp) {
+        // This is an existing app, so we update it.
+        const docRef = doc(firestore, 'apps', id);
+        updateDocumentNonBlocking(docRef, dataToSave);
+        toast({ title: "Success", description: "App updated successfully." });
+    } else {
+        // This is a new app. We add it to get a new ID.
+        const appsCollectionRef = collection(firestore, 'apps');
+        try {
+            // First, add the document without an ID to get a new reference.
+            const newDocRef = await addDocumentNonBlocking(appsCollectionRef, dataToSave);
+            if (newDocRef) {
+                // Now, update the newly created document to include its own ID.
+                updateDocumentNonBlocking(newDocRef, { id: newDocRef.id });
+                toast({ title: "Success", description: "App added successfully." });
+            } else {
+                throw new Error("Document creation failed silently.");
+            }
+        } catch (e) {
+            console.error("Failed to add app:", e);
+            toast({ variant: "destructive", title: "Error", description: "Failed to add app." });
+        }
+    }
+};
 
   return (
     <Card className="w-full">

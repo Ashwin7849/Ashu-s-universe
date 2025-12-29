@@ -72,14 +72,9 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
     } : { ...initialFormData, id: `temp_${Date.now()}` };
     setFormData(currentData);
     setSelectedApkFileName(null);
-    setApkDataUrl(null);
+    // Reset APK data URL but respect existing downloadLink from the app data
+    setApkDataUrl(app?.downloadLink || null);
     
-    if (app?.iconUrl) {
-      setApkDataUrl(app.iconUrl);
-    } else {
-      const appImage = PlaceHolderImages.find((img) => img.id === currentData.icon);
-      setApkDataUrl(appImage?.imageUrl || null);
-    }
   }, [app, isOpen]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -115,7 +110,6 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
       const reader = new FileReader();
       reader.onloadend = () => {
         const result = reader.result as string;
-        setApkDataUrl(result);
         setFormData(prev => ({ ...prev, iconUrl: result }));
       };
       reader.readAsDataURL(file);
@@ -127,12 +121,8 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
     const dataToSave: App = { 
       ...formData,
       downloadCount: Number(formData.downloadCount) || 0,
+      downloadLink: apkDataUrl || formData.downloadLink || '#' // Prioritize newly uploaded APK
      };
-    if (apkDataUrl) {
-      dataToSave.downloadLink = apkDataUrl;
-    } else if (!app?.downloadLink) {
-      dataToSave.downloadLink = '#';
-    }
 
     onSave(dataToSave);
     setIsOpen(false);
@@ -141,6 +131,8 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
   const handleAiGeneratedDescription = (description: string) => {
     setFormData(prev => ({ ...prev, shortDescription: description }));
   };
+  
+  const iconPreview = formData.iconUrl || PlaceHolderImages.find(p => p.id === formData.icon)?.imageUrl;
 
   return (
     <>
@@ -179,9 +171,9 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
                     Icon
                 </Label>
                 <div className="col-span-3 flex items-center gap-4">
-                    {apkDataUrl && (
+                    {iconPreview && (
                         <Image
-                        src={apkDataUrl}
+                        src={iconPreview}
                         alt="Icon preview"
                         width={64}
                         height={64}
