@@ -23,7 +23,7 @@ export default function AdminLoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const auth = useAuth();
-  const [email, setEmail] = useState("Ashu000@example.com");
+  const [email, setEmail] = useState("ashwincharan744@gmail.com");
   const [password, setPassword] = useState("Ashu78");
   const [isLoading, setIsLoading] = useState(false);
 
