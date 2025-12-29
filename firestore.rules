@@ -73,7 +73,7 @@ service cloud.firestore {
      */
     match /website_settings/global {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isSignedIn();
     }
   }
 }
