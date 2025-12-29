@@ -7,10 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDoc, useFirestore, useMemoFirebase, useUser } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import type { DeveloperProfile, WebsiteSettings } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
-import { updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
@@ -29,11 +28,9 @@ export default function SettingsPage() {
   const { user, isUserLoading } = useUser();
   const { toast } = useToast();
 
-  // Refs for the two separate documents
   const socialSettingsRef = useMemoFirebase(() => firestore ? doc(firestore, 'website_settings', 'global') : null, [firestore]);
   const profileRef = useMemoFirebase(() => (firestore && user) ? doc(firestore, 'developer_profiles', user.uid) : null, [firestore, user]);
 
-  // Hooks to fetch data from the two documents
   const { data: socialSettings, isLoading: isSocialLoading } = useDoc<WebsiteSettings>(socialSettingsRef);
   const { data: profileData, isLoading: isProfileLoading } = useDoc<DeveloperProfile>(profileRef);
 
@@ -41,7 +38,6 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [skillsString, setSkillsString] = useState('');
   
-  // Effect to merge data from both sources into the form state
   useEffect(() => {
     if (socialSettings || profileData) {
       const combinedData: FormData = {
@@ -75,33 +71,32 @@ export default function SettingsPage() {
     }
     setIsSaving(true);
     
-    // Separate data for each document
+    // Ensure payload fields are not undefined
     const profilePayload: Partial<DeveloperProfile> = {
-      name: formData.name,
-      username: formData.username,
-      avatar: formData.avatar,
-      bio: formData.bio,
-      quote: formData.quote,
+      name: formData.name || '',
+      username: formData.username || '',
+      avatar: formData.avatar || '',
+      bio: formData.bio || '',
+      quote: formData.quote || '',
       skills: skillsString.split(',').map(s => s.trim()).filter(s => s),
-      education: formData.education,
-      location: formData.location,
-      birthday: formData.birthday,
+      education: formData.education || '',
+      location: formData.location || '',
+      birthday: formData.birthday || '',
     };
     
     const socialPayload: Partial<WebsiteSettings> = {
-      whatsappChannelLink: formData.whatsappChannelLink,
-      telegramChannelLink: formData.telegramChannelLink,
-      instagramLink: formData.instagramLink,
-      youtubeLink: formData.youtubeLink,
+      whatsappChannelLink: formData.whatsappChannelLink || '',
+      telegramChannelLink: formData.telegramChannelLink || '',
+      instagramLink: formData.instagramLink || '',
+      youtubeLink: formData.youtubeLink || '',
     };
 
     try {
-      // Update both documents
       if (profileRef) {
-          updateDocumentNonBlocking(profileRef, profilePayload); 
+          await updateDoc(profileRef, profilePayload);
       }
       if (socialSettingsRef) {
-          updateDocumentNonBlocking(socialSettingsRef, socialPayload);
+          await updateDoc(socialSettingsRef, socialPayload);
       }
       toast({ title: 'Success!', description: 'Your settings have been saved.' });
     } catch (error) {
