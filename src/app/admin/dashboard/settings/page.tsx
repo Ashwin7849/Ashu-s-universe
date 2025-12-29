@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDoc, useFirestore, useMemoFirebase, useUser } from '@/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, writeBatch } from 'firebase/firestore';
 import type { DeveloperProfile, WebsiteSettings } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from '@/components/ui/skeleton';
@@ -71,7 +71,7 @@ export default function SettingsPage() {
     }
     setIsSaving(true);
     
-    // Ensure payload fields are not undefined
+    // Define a clean payload for the developer profile
     const profilePayload: Partial<DeveloperProfile> = {
       name: formData.name || '',
       username: formData.username || '',
@@ -84,6 +84,7 @@ export default function SettingsPage() {
       birthday: formData.birthday || '',
     };
     
+    // Define a clean payload for the website settings
     const socialPayload: Partial<WebsiteSettings> = {
       whatsappChannelLink: formData.whatsappChannelLink || '',
       telegramChannelLink: formData.telegramChannelLink || '',
@@ -92,16 +93,27 @@ export default function SettingsPage() {
     };
 
     try {
+      // Use a batch write to update both documents atomically
+      const batch = writeBatch(firestore);
+
       if (profileRef) {
-          await updateDoc(profileRef, profilePayload);
+        // Set merge to true to only update fields present in the payload
+        batch.set(profileRef, profilePayload, { merge: true });
       }
       if (socialSettingsRef) {
-          await updateDoc(socialSettingsRef, socialPayload);
+        batch.set(socialSettingsRef, socialPayload, { merge: true });
       }
+
+      await batch.commit();
+
       toast({ title: 'Success!', description: 'Your settings have been saved.' });
     } catch (error) {
       console.error("Error saving settings: ", error);
-      toast({ variant: 'destructive', title: 'Error', description: 'Failed to save settings.' });
+      if (error instanceof Error) {
+        toast({ variant: 'destructive', title: 'Error saving settings', description: error.message });
+      } else {
+        toast({ variant: 'destructive', title: 'Error', description: 'An unknown error occurred while saving.' });
+      }
     } finally {
       setIsSaving(false);
     }
