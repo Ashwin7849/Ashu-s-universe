@@ -12,6 +12,15 @@ import type { ProfileData } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 import { updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+import Image from 'next/image';
 
 export default function SettingsPage() {
   const firestore = useFirestore();
@@ -30,6 +39,10 @@ export default function SettingsPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleSelectChange = (id: string, value: string) => {
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
@@ -55,6 +68,8 @@ export default function SettingsPage() {
       setIsSaving(false);
     }
   };
+
+  const selectedAvatarPreview = PlaceHolderImages.find(p => p.id === formData.avatar)?.imageUrl;
   
   if (isDocLoading) {
       return (
@@ -88,6 +103,34 @@ export default function SettingsPage() {
               <Label htmlFor="username">Username</Label>
               <Input id="username" value={formData.username || ''} onChange={handleInputChange} placeholder="@yourhandle" />
             </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            <div className="space-y-2">
+              <Label htmlFor="avatar">Avatar</Label>
+              <Select onValueChange={(value) => handleSelectChange('avatar', value)} value={formData.avatar}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an avatar" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PlaceHolderImages.filter(p => p.id.startsWith('profile')).map(image => (
+                    <SelectItem key={image.id} value={image.id}>
+                      {image.description}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {selectedAvatarPreview && (
+              <div className="flex justify-center">
+                <Image 
+                  src={selectedAvatarPreview}
+                  alt="Avatar preview"
+                  width={80}
+                  height={80}
+                  className="rounded-full object-cover"
+                />
+              </div>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="bio">Bio</Label>

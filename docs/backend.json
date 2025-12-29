@@ -98,7 +98,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "WebsiteSettings",
       "type": "object",
-      "description": "Represents global website settings configurable via the admin panel.",
+      "description": "Represents global website settings and developer profile information configurable via the admin panel.",
       "properties": {
         "id": {
           "type": "string",
@@ -124,13 +124,44 @@
           "description": "URL for the YouTube button.",
           "format": "uri"
         },
-        "heroTitle": {
+        "name": {
           "type": "string",
-          "description": "Title for the Hero section."
+          "description": "The developer's name."
         },
-        "heroSubtitle": {
+        "username": {
           "type": "string",
-          "description": "Subtitle for the Hero section."
+          "description": "The developer's username or handle."
+        },
+        "avatar": {
+          "type": "string",
+          "description": "An identifier for the developer's profile picture, linking to a placeholder image."
+        },
+        "bio": {
+          "type": "string",
+          "description": "A short biography for the developer."
+        },
+        "quote": {
+          "type": "string",
+          "description": "A favorite quote of the developer."
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of the developer's skills and technologies."
+        },
+        "education": {
+          "type": "string",
+          "description": "The developer's educational background."
+        },
+        "location": {
+          "type": "string",
+          "description": "The developer's location."
+        },
+        "birthday": {
+          "type": "string",
+          "description": "The developer's birthday."
         }
       },
       "required": [

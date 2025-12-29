@@ -1,10 +1,22 @@
 {
   "placeholderImages": [
     {
-      "id": "profile-pic",
-      "description": "Developer profile picture",
+      "id": "profile-pic-1",
+      "description": "Developer portrait 1",
       "imageUrl": "https://images.unsplash.com/photo-1689218742383-c4e7b8494e75?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxkZXZlbG9wZXIlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjY4MjY3ODd8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "developer portrait"
+    },
+    {
+      "id": "profile-pic-2",
+      "description": "Developer portrait 2",
+      "imageUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjb2Rpbmd8ZW58MHx8fHwxNzA3NjQyMzgyfDA&ixlib=rb-4.0.3&q=80&w=1080",
+      "imageHint": "coding computer"
+    },
+    {
+      "id": "profile-pic-3",
+      "description": "Developer portrait 3",
+      "imageUrl": "https://images.unsplash.com/photo-1587620962725-abab7fe55159?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjb2Rpbmd8ZW58MHx8fHwxNzA3NjQyMzgyfDA&ixlib=rb-4.0.3&q=80&w=1080",
+      "imageHint": "developer setup"
     },
     {
       "id": "app-icon-1",
