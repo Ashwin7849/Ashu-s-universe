@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AdminSidebar } from '@/components/admin/admin-sidebar';
 import { Header } from '@/components/shared/header';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore } from '@/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { ShieldAlert } from 'lucide-react';
@@ -30,9 +30,14 @@ export default function DashboardLayout({
     // If we have a user, check for admin role
     if (user && firestore) {
       const checkAdminStatus = async () => {
-        const adminRoleRef = doc(firestore, 'roles_admin', user.uid);
-        const adminDoc = await getDoc(adminRoleRef);
-        setIsAdmin(adminDoc.exists());
+        try {
+          const adminRoleRef = doc(firestore, 'roles_admin', user.uid);
+          const adminDoc = await getDoc(adminRoleRef);
+          setIsAdmin(adminDoc.exists());
+        } catch (error) {
+            console.error("Error checking admin status:", error);
+            setIsAdmin(false); // Assume not admin on error
+        }
       };
       checkAdminStatus();
     }
