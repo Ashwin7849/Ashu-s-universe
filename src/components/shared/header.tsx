@@ -24,7 +24,7 @@ export function Header() {
         <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <Logo className="h-6 w-6 text-primary" />
-            <span className="font-bold sm:inline-block">AppVerse Hub</span>
+            <span className="font-bold sm:inline-block">Ashu's Universe</span>
           </Link>
         </div>
 
@@ -57,7 +57,7 @@ export function Header() {
               </SheetHeader>
               <Link href="/" className="mr-6 flex items-center space-x-2 mb-6">
                 <Logo className="h-6 w-6 text-primary" />
-                <span className="font-bold">AppVerse Hub</span>
+                <span className="font-bold">Ashu's Universe</span>
               </Link>
               <div className="flex flex-col space-y-3">
                 {navLinks.map((link) => (
