@@ -57,7 +57,6 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
   const [formData, setFormData] = useState<App>(app || initialFormData);
   const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
   const [selectedApkFileName, setSelectedApkFileName] = useState<string | null>(null);
-  const [iconPreview, setIconPreview] = useState<string | null>(null);
   const [apkDataUrl, setApkDataUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -70,16 +69,16 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
         longDescription: app.longDescription || '',
         telegramLink: app.telegramLink || '',
         websiteLink: app.websiteLink || '',
-    } : initialFormData;
+    } : { ...initialFormData, id: `temp_${Date.now()}` };
     setFormData(currentData);
     setSelectedApkFileName(null);
     setApkDataUrl(null);
     
-    if (currentData.iconUrl) {
-      setIconPreview(currentData.iconUrl);
+    if (app?.iconUrl) {
+      setApkDataUrl(app.iconUrl);
     } else {
       const appImage = PlaceHolderImages.find((img) => img.id === currentData.icon);
-      setIconPreview(appImage?.imageUrl || null);
+      setApkDataUrl(appImage?.imageUrl || null);
     }
   }, [app, isOpen]);
 
@@ -116,7 +115,7 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
       const reader = new FileReader();
       reader.onloadend = () => {
         const result = reader.result as string;
-        setIconPreview(result);
+        setApkDataUrl(result);
         setFormData(prev => ({ ...prev, iconUrl: result }));
       };
       reader.readAsDataURL(file);
@@ -125,7 +124,7 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
 
 
   const handleSaveClick = () => {
-    const dataToSave = { 
+    const dataToSave: App = { 
       ...formData,
       downloadCount: Number(formData.downloadCount) || 0,
      };
@@ -180,9 +179,9 @@ export function AppFormSheet({ isOpen, setIsOpen, app, onSave }: AppFormSheetPro
                     Icon
                 </Label>
                 <div className="col-span-3 flex items-center gap-4">
-                    {iconPreview && (
+                    {apkDataUrl && (
                         <Image
-                        src={iconPreview}
+                        src={apkDataUrl}
                         alt="Icon preview"
                         width={64}
                         height={64}

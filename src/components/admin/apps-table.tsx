@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -72,25 +73,24 @@ export function AppsTable() {
   const handleSave = async (appData: AppType) => {
     if (!firestore) return;
 
-    if (editingApp) {
-      // Update existing app
+    if (editingApp || appData.id.startsWith("temp_")) {
+      // Update existing app or a new app that has a temporary ID
       const { id, ...dataToUpdate } = appData;
-      const docRef = doc(firestore, 'apps', id);
-      updateDocumentNonBlocking(docRef, dataToUpdate);
-      toast({ title: "Success", description: "App updated successfully." });
-    } else {
-      // Add new app
-      const { id, ...dataToAdd } = appData; // The local ID is not needed for a new doc
-      const appsCollectionRef = collection(firestore, 'apps');
-      try {
-        const newDocRef = await addDocumentNonBlocking(appsCollectionRef, dataToAdd);
-        if (newDocRef) {
-          // Optionally update the new doc with its own ID if your data model requires it
-          updateDocumentNonBlocking(newDocRef, { id: newDocRef.id });
-        }
-        toast({ title: "Success", description: "App added successfully." });
-      } catch (e) {
-        toast({ variant: "destructive", title: "Error", description: "Failed to add app." });
+      if (editingApp) {
+        const docRef = doc(firestore, 'apps', id);
+        updateDocumentNonBlocking(docRef, dataToUpdate);
+        toast({ title: "Success", description: "App updated successfully." });
+      } else {
+         const appsCollectionRef = collection(firestore, 'apps');
+         try {
+            const newDocRef = await addDocumentNonBlocking(appsCollectionRef, dataToUpdate);
+            if (newDocRef) {
+                updateDocumentNonBlocking(newDocRef, { id: newDocRef.id });
+            }
+            toast({ title: "Success", description: "App added successfully." });
+         } catch (e) {
+            toast({ variant: "destructive", title: "Error", description: "Failed to add app." });
+         }
       }
     }
   };
