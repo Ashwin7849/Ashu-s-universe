@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import {
   Activity,
@@ -16,6 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const stats = [
