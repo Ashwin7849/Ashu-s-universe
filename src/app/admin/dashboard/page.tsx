@@ -1,3 +1,4 @@
+'use client';
 
 import Link from "next/link";
 import {
@@ -17,7 +18,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const stats = [
