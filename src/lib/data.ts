@@ -6,58 +6,6 @@ import {
   WhatsappIcon,
 } from "@/components/icons";
 
-export const apps: App[] = [
-  {
-    id: "1",
-    name: "CosmoNote",
-    description: "Your next-gen note-taking app, powered by AI.",
-    version: "2.1.0",
-    size: "55 MB",
-    icon: "app-icon-1",
-    downloadUrl: "#",
-    projectUrl: "#",
-    tag: "UPDATED",
-    downloads: 12500,
-    isVisible: true,
-  },
-  {
-    id: "2",
-    name: "Galactic Grid",
-    description: "A strategic puzzle game set in the depths of space.",
-    version: "1.5.2",
-    size: "120 MB",
-    icon: "app-icon-2",
-    downloadUrl: "#",
-    tag: "HOT",
-    downloads: 48300,
-    isVisible: true,
-  },
-  {
-    id: "3",
-    name: "Stellar Share",
-    description: "Connect and share moments across the universe.",
-    version: "3.0.1",
-    size: "80 MB",
-    icon: "app-icon-3",
-    downloadUrl: "#",
-    projectUrl: "#",
-    tag: "NEW",
-    downloads: 5200,
-    isVisible: true,
-  },
-  {
-    id: "4",
-    name: "Orion Optimizer",
-    description: "Keep your device running at light speed.",
-    version: "4.2.0",
-    size: "25 MB",
-    icon: "app-icon-4",
-    downloadUrl: "#",
-    downloads: 31000,
-    isVisible: false,
-  },
-];
-
 export const socialLinks: SocialLink[] = [
   { name: "WhatsApp", url: "#", icon: WhatsappIcon },
   { name: "Telegram", url: "#", icon: TelegramIcon },

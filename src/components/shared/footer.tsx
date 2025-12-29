@@ -1,8 +1,25 @@
+'use client';
+
+import { useMemo } from 'react';
 import Link from "next/link";
-import { socialLinks } from "@/lib/data";
 import { Button } from "@/components/ui/button";
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import type { WebsiteSettings } from '@/lib/types';
+import { YoutubeIcon, InstagramIcon, TelegramIcon, WhatsappIcon } from "@/components/icons";
 
 export function Footer() {
+  const firestore = useFirestore();
+  const settingsRef = useMemoFirebase(() => firestore ? doc(firestore, 'website_settings', 'global') : null, [firestore]);
+  const { data: settings } = useDoc<WebsiteSettings>(settingsRef);
+
+  const socialLinks = useMemo(() => [
+    { name: "WhatsApp", url: settings?.whatsappChannelLink, icon: WhatsappIcon },
+    { name: "Telegram", url: settings?.telegramChannelLink, icon: TelegramIcon },
+    { name: "Instagram", url: settings?.instagramLink, icon: InstagramIcon },
+    { name: "YouTube", url: settings?.youtubeLink, icon: YoutubeIcon },
+  ].filter(link => link.url), [settings]);
+
   return (
     <footer className="w-full border-t border-border/40">
       <div className="container flex flex-col items-center justify-between gap-4 py-10 md:h-24 md:flex-row md:py-0">
@@ -14,7 +31,7 @@ export function Footer() {
         <div className="flex items-center gap-2">
           {socialLinks.map((link) => (
             <Button key={link.name} variant="ghost" size="icon" asChild>
-              <Link href={link.url} target="_blank">
+              <Link href={link.url!} target="_blank">
                 <link.icon className="h-5 w-5" />
                 <span className="sr-only">{link.name}</span>
               </Link>

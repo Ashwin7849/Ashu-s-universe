@@ -42,3 +42,15 @@ export type DeveloperProfile = {
 export type AdminRole = {
   isAdmin: boolean;
 };
+
+export type WebsiteSettings = {
+  id?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  whatsappChannelLink?: string;
+  telegramChannelLink?: string;
+  instagramLink?: string;
+  youtubeLink?: string;
+}
+
+export type ProfileData = DeveloperProfile & WebsiteSettings;

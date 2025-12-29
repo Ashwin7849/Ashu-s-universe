@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Package, User } from "lucide-react";
+import { Home, Package, User, Settings } from "lucide-react";
 import { Logo } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: Home },
   { href: "/admin/dashboard/apps", label: "Apps", icon: Package },
-  { href: "/profile", label: "Profile", icon: User },
+  { href: "/admin/dashboard/settings", label: "Settings", icon: Settings },
+  { href: "/profile", label: "View Profile", icon: User },
 ];
 
 export function AdminSidebar() {
