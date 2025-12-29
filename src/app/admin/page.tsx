@@ -15,37 +15,38 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Logo } from "@/components/icons";
+import { useAuth } from "@/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const auth = useAuth();
+  const [username, setUsername] = useState("Ashu000");
+  const [password, setPassword] = useState("Ashu78");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Mock authentication. In a real app, use Firebase Auth.
-    setTimeout(() => {
-      if (username === "Ashu000" && password === "Ashu78") {
-        toast({
-          title: "Login Successful",
-          description: "Redirecting to dashboard...",
-        });
-        // In a real app, you would set a session cookie or token here.
-        localStorage.setItem("admin_auth", "true");
-        router.push("/admin/dashboard");
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: "Invalid username or password.",
-        });
-        setIsLoading(false);
-      }
-    }, 1000);
+    try {
+      await signInWithEmailAndPassword(auth, username, password);
+      toast({
+        title: "Login Successful",
+        description: "Redirecting to dashboard...",
+      });
+      router.push("/admin/dashboard");
+    } catch (error: any) {
+      console.error("Login failed:", error);
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: "Invalid username or password.",
+      });
+      setIsLoading(false);
+    }
   };
 
   return (

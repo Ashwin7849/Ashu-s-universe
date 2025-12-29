@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation';
 import { AdminSidebar } from '@/components/admin/admin-sidebar';
 import { Header } from '@/components/shared/header';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { Button } from '@/components/ui/button';
+import { ShieldAlert } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -12,19 +16,30 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const [isAuth, setIsAuth] = useState(false);
+  const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Mock authentication check.
-    const authStatus = localStorage.getItem('admin_auth');
-    if (authStatus !== 'true') {
+    // If user loading is finished and there's no user, redirect to login
+    if (!isUserLoading && !user) {
       router.replace('/admin');
-    } else {
-      setIsAuth(true);
+      return;
     }
-  }, [router]);
+    
+    // If we have a user, check for admin role
+    if (user && firestore) {
+      const checkAdminStatus = async () => {
+        const adminRoleRef = doc(firestore, 'roles_admin', user.uid);
+        const adminDoc = await getDoc(adminRoleRef);
+        setIsAdmin(adminDoc.exists());
+      };
+      checkAdminStatus();
+    }
+  }, [user, isUserLoading, firestore, router]);
 
-  if (!isAuth) {
+  // Show a loading skeleton while checking auth and admin status
+  if (isUserLoading || isAdmin === null) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
@@ -38,6 +53,23 @@ export default function DashboardLayout({
     );
   }
 
+  // If user is not an admin, show unauthorized message
+  if (!isAdmin) {
+    return (
+      <div className="flex h-screen w-full flex-col items-center justify-center bg-background text-center">
+        <ShieldAlert className="h-16 w-16 text-destructive" />
+        <h1 className="mt-4 text-3xl font-bold">Unauthorized</h1>
+        <p className="mt-2 text-muted-foreground">
+          You do not have permission to view this page.
+        </p>
+        <Button onClick={() => router.replace('/admin')} className="mt-6">
+          Go to Login
+        </Button>
+      </div>
+    );
+  }
+  
+  // If user is an admin, render the dashboard
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <AdminSidebar />
