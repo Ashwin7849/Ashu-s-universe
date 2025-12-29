@@ -26,6 +26,7 @@ export type SocialLink = {
 };
 
 export type DeveloperProfile = {
+  id?: string; // UID from Firebase Auth
   name: string;
   username: string;
   avatar: string; // id from placeholder-images.json
@@ -37,16 +38,12 @@ export type DeveloperProfile = {
   birthday: string;
 };
 
-// This represents the data structure for a user's role document in Firestore.
-// It's used for client-side type safety when checking admin status.
 export type AdminRole = {
   isAdmin: boolean;
 };
 
 export type WebsiteSettings = {
-  id?: string;
-  heroTitle?: string;
-  heroSubtitle?: string;
+  id?: string; // Should be 'global'
   whatsappChannelLink?: string;
   telegramChannelLink?: string;
   instagramLink?: string;

@@ -94,35 +94,15 @@
         "username"
       ]
     },
-    "WebsiteSettings": {
+    "DeveloperProfile": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "WebsiteSettings",
+      "title": "DeveloperProfile",
       "type": "object",
-      "description": "Represents global website settings and developer profile information configurable via the admin panel.",
+      "description": "Represents the developer's public profile information.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the WebsiteSettings entity.  There should only be one of these."
-        },
-        "whatsappChannelLink": {
-          "type": "string",
-          "description": "URL for the WhatsApp channel button.",
-          "format": "uri"
-        },
-        "telegramChannelLink": {
-          "type": "string",
-          "description": "URL for the Telegram channel button.",
-          "format": "uri"
-        },
-        "instagramLink": {
-          "type": "string",
-          "description": "URL for the Instagram button.",
-          "format": "uri"
-        },
-        "youtubeLink": {
-          "type": "string",
-          "description": "URL for the YouTube button.",
-          "format": "uri"
+          "description": "Unique identifier, matching the user's auth UID."
         },
         "name": {
           "type": "string",
@@ -167,6 +147,41 @@
       "required": [
         "id"
       ]
+    },
+    "WebsiteSettings": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WebsiteSettings",
+      "type": "object",
+      "description": "Represents global website settings, primarily social media links.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WebsiteSettings entity. There should only be one of these with the ID 'global'."
+        },
+        "whatsappChannelLink": {
+          "type": "string",
+          "description": "URL for the WhatsApp channel button.",
+          "format": "uri"
+        },
+        "telegramChannelLink": {
+          "type": "string",
+          "description": "URL for the Telegram channel button.",
+          "format": "uri"
+        },
+        "instagramLink": {
+          "type": "string",
+          "description": "URL for the Instagram button.",
+          "format": "uri"
+        },
+        "youtubeLink": {
+          "type": "string",
+          "description": "URL for the YouTube button.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id"
+      ]
     }
   },
   "auth": {
@@ -200,7 +215,7 @@
           "schema": {
             "$ref": "#/backend/entities/AdminUser"
           },
-          "description": "Collection to store admin user IDs. Existence of a document implies admin role. This ensures authorization independence.",
+          "description": "Collection to store admin user IDs. Existence of a document implies admin role.",
           "params": [
             {
               "name": "adminId",
@@ -215,17 +230,33 @@
         }
       },
       {
+        "path": "/developer_profiles/{userId}",
+        "definition": {
+          "entityName": "DeveloperProfile",
+          "schema": {
+            "$ref": "#/backend/entities/DeveloperProfile"
+          },
+          "description": "Stores the public profile for a single developer. The document ID should match the user's Firebase Auth UID.",
+          "params": [
+             {
+              "name": "userId",
+              "description": "The unique identifier of the user (same as their Firebase Auth UID)."
+            }
+          ]
+        }
+      },
+      {
         "path": "/website_settings/global",
         "definition": {
           "entityName": "WebsiteSettings",
           "schema": {
             "$ref": "#/backend/entities/WebsiteSettings"
           },
-          "description": "Stores global website settings. There should only be a single document with ID 'global'. Only admins can modify this document.",
+          "description": "Stores global website settings. There should only be a single document with ID 'global'.",
           "params": []
         }
       }
     ],
-    "reasoning": "This Firestore structure prioritizes security, scalability, and debuggability, following the core design principles.  It focuses on enabling a portfolio application with an admin panel for managing apps and website settings. Authorization Independence is achieved through the use of dedicated collections for admin roles, eliminating the need for `get()` calls in security rules.  QAPs are addressed by segregating data with different access requirements (public apps vs. admin settings) and utilizing existence checks for global roles (admins).  The structure also supports invariants like ensuring only admins can modify website settings."
+    "reasoning": "This Firestore structure separates concerns more effectively. Public app data is in `/apps`. Admin roles are managed in `/roles_admin`. Site-wide settings like social links are in a singleton document `/website_settings/global`. Crucially, the developer's personal profile data is now in its own collection `/developer_profiles/{userId}`, allowing for specific security rules where a user can only edit their own profile. This resolves the previous permission issues."
   }
 }

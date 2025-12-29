@@ -8,18 +8,17 @@
  * - /apps/{appId}: A top-level collection containing all public application data.
  * - /roles_admin/{userId}: A private collection that grants admin privileges. If a user's UID exists
  *   as a document ID in this collection, they are considered an admin.
+ * - /developer_profiles/{userId}: Stores the public profile for a user. Only the authenticated owner can write to their own profile.
  * - /website_settings/global: A singleton document for publicly readable website configuration.
  *
  * Key Security Decisions:
- * - Public Read-Only Default: Data in /apps and /website_settings is publicly readable to ensure the
- *   website is functional for all visitors, including those not signed in.
- * - Admin-Only Writes: All write operations (create, update, delete) across the database are restricted
- *   to users who are authenticated and possess an admin role.
- * - Admin Role Management: The /roles_admin collection is used to efficiently check for admin status
- *   using an `exists()` call, which is highly performant. This collection is secured so that only
+ * - Public Read-Only Default: Data in /apps, /developer_profiles, and /website_settings is publicly readable to ensure the
+ *   website is functional for all visitors.
+ * - Admin-Only Writes for Core Content: Write operations for /apps and /website_settings are restricted
+ *   to users with an admin role.
+ * - User-Owned Profile Writes: Authenticated users can only write to their own document in the /developer_profiles collection.
+ * - Admin Role Management: The /roles_admin collection is secured so that only
  *   existing admins can manage its documents, preventing unauthorized self-promotion to admin status.
- * - No User Enumeration: Listing documents in the /roles_admin collection is explicitly disallowed to
- *   prevent malicious actors from discovering the identities of all administrators.
  */
 rules_version = '2';
 service cloud.firestore {
@@ -67,13 +66,21 @@ service cloud.firestore {
       allow list: if false; // Prevent listing all admins
       allow write: if isAdmin();
     }
+    
+    /**
+     * Public developer profile. Anyone can read, but only the owner can write.
+     */
+    match /developer_profiles/{userId} {
+        allow read: if true;
+        allow write: if isSignedIn() && request.auth.uid == userId;
+    }
 
     /**
      * Singleton document for global website settings. Publicly readable, admin-writable.
      */
     match /website_settings/global {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow write: if isAdmin();
     }
   }
 }

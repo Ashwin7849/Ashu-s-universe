@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useDoc, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { doc } from 'firebase/firestore';
-import type { ProfileData } from '@/lib/types';
+import type { DeveloperProfile, WebsiteSettings } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 import { updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -22,24 +22,38 @@ import {
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
 
+type FormData = Partial<DeveloperProfile & WebsiteSettings>;
+
 export default function SettingsPage() {
   const firestore = useFirestore();
-  const settingsRef = useMemoFirebase(() => firestore ? doc(firestore, 'website_settings', 'global') : null, [firestore]);
-  const { data: settings, isLoading: isDocLoading } = useDoc<ProfileData>(settingsRef);
+  const { user, isUserLoading } = useUser();
   const { toast } = useToast();
 
-  const [formData, setFormData] = useState<Partial<ProfileData>>({});
+  // Refs for the two separate documents
+  const socialSettingsRef = useMemoFirebase(() => firestore ? doc(firestore, 'website_settings', 'global') : null, [firestore]);
+  const profileRef = useMemoFirebase(() => (firestore && user) ? doc(firestore, 'developer_profiles', user.uid) : null, [firestore, user]);
+
+  // Hooks to fetch data from the two documents
+  const { data: socialSettings, isLoading: isSocialLoading } = useDoc<WebsiteSettings>(socialSettingsRef);
+  const { data: profileData, isLoading: isProfileLoading } = useDoc<DeveloperProfile>(profileRef);
+
+  const [formData, setFormData] = useState<FormData>({});
   const [isSaving, setIsSaving] = useState(false);
   const [skillsString, setSkillsString] = useState('');
-
+  
+  // Effect to merge data from both sources into the form state
   useEffect(() => {
-    if (settings) {
-      setFormData(settings);
-      if (Array.isArray(settings.skills)) {
-        setSkillsString(settings.skills.join(', '));
+    if (socialSettings || profileData) {
+      const combinedData: FormData = {
+        ...socialSettings,
+        ...profileData,
+      };
+      setFormData(combinedData);
+      if (Array.isArray(profileData?.skills)) {
+        setSkillsString(profileData.skills.join(', '));
       }
     }
-  }, [settings]);
+  }, [socialSettings, profileData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -54,22 +68,41 @@ export default function SettingsPage() {
     setSkillsString(e.target.value);
   };
 
-
   const handleSave = async () => {
-    if (!firestore) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Firestore not available.' });
+    if (!firestore || !user) {
+      toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to save.' });
       return;
     }
     setIsSaving(true);
     
-    const dataToSave = {
-      ...formData,
+    // Separate data for each document
+    const profilePayload: Partial<DeveloperProfile> = {
+      name: formData.name,
+      username: formData.username,
+      avatar: formData.avatar,
+      bio: formData.bio,
+      quote: formData.quote,
       skills: skillsString.split(',').map(s => s.trim()).filter(s => s),
+      education: formData.education,
+      location: formData.location,
+      birthday: formData.birthday,
+    };
+    
+    const socialPayload: Partial<WebsiteSettings> = {
+      whatsappChannelLink: formData.whatsappChannelLink,
+      telegramChannelLink: formData.telegramChannelLink,
+      instagramLink: formData.instagramLink,
+      youtubeLink: formData.youtubeLink,
     };
 
     try {
-      const docRef = doc(firestore, 'website_settings', 'global');
-      updateDocumentNonBlocking(docRef, dataToSave); 
+      // Update both documents
+      if (profileRef) {
+          updateDocumentNonBlocking(profileRef, profilePayload); 
+      }
+      if (socialSettingsRef) {
+          updateDocumentNonBlocking(socialSettingsRef, socialPayload);
+      }
       toast({ title: 'Success!', description: 'Your settings have been saved.' });
     } catch (error) {
       console.error("Error saving settings: ", error);
@@ -79,9 +112,10 @@ export default function SettingsPage() {
     }
   };
 
+  const isLoading = isUserLoading || isSocialLoading || isProfileLoading;
   const selectedAvatarPreview = PlaceHolderImages.find(p => p.id === formData.avatar)?.imageUrl;
   
-  if (isDocLoading) {
+  if (isLoading) {
       return (
           <div className="space-y-6">
               <Skeleton className="h-48 w-full" />
