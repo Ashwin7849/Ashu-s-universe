@@ -28,7 +28,7 @@ export function Footer() {
             © {new Date().getFullYear()} Ashu's Universe. All rights reserved.
           </p>
           <p className="text-center text-sm font-medium text-foreground/80 md:text-left">
-            App Credit: madxabhi
+            App Credit: MadXabhi
           </p>
         </div>
         <div className="flex items-center gap-2">
