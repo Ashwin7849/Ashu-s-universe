@@ -27,7 +27,7 @@ export function Footer() {
           <p className="text-center text-sm leading-loose md:text-left">
             © {new Date().getFullYear()} Ashu's Universe. All rights reserved.
           </p>
-          <p className="text-center text-xs text-muted-foreground md:text-left">
+          <p className="text-center text-sm font-medium text-foreground/80 md:text-left">
             App Credit: madxabhi
           </p>
         </div>
