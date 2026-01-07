@@ -1,6 +1,6 @@
 const stats = [
   { value: "50K+", label: "Downloads" },
-  { value: "5K+", label: "Active Users" },
+  { value: "25K+", label: "Active Users" },
   { value: "20K+", label: "Positive Reviews" },
   { value: "99.9%", label: "Uptime" },
 ];
